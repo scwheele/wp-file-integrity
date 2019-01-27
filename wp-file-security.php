@@ -1,14 +1,5 @@
 <?php
-/*
- * Plugin Name: wp-file-security
- * Plugin URI: https://swheeler.co
- * Description: Checks files for changes
- * Version: 0.1
- * Author: Scott Wheeler
- * Author URI: https://swheeler.co
-*/
 
-define('WP_DEBUG', true);
 
 function wp_file_sec_install() {
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
@@ -31,9 +22,13 @@ function wp_file_sec_install() {
         `change_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
     ) $charset_collate;";
     dbDelta($sql);
+
+    wp_schedule_event(time(), 'hourly', 'hourly_file_scan');
+    if(!wp_next_scheduled('hourly_file_scan')) {
+        wp_schedule_event(time(), 'hourly', 'hourly_file_scan');
+    }
 }
 
-register_activation_hook(__FILE__, 'wp_file_sec_install');
 
 function wp_file_sec_scan_files() {
     $home_path = ABSPATH;
@@ -72,8 +67,7 @@ function wp_file_sec_scan_files() {
         }
     }
 }
-
-add_action('get_header', 'wp_file_sec_scan_files');
+add_action('hourly_file_scan', 'wp_file_sec_scan_files');
 
 function update_file($filename, $filehash) {
     global $wpdb;
