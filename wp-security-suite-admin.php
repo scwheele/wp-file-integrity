@@ -41,3 +41,29 @@ function wp_security_suite_file_change_logs() {
         echo "No data available.";
     }
 }
+
+function wp_sec_setting_section_update_callback() {
+    echo "<p>Enter email to be notified at.";
+}
+
+function wp_sec_setting_update_callback() {
+    echo '<input name="wp_sec_email" id="wp_sec_email" type="text" value="' . get_option('wp_sec_email') . '">';
+}
+
+function wp_sec_settings_api_init() {
+   add_settings_section(
+     'wp_sec_email',
+     'WP Sec Configuration',
+     'wp_sec_setting_section_update_callback',
+     'general'
+   );
+   add_settings_field(
+     'wp_sec_email',
+     'Email to notify.',
+     'wp_sec_setting_update_callback',
+     'general',
+     'wp_sec_email'
+   );
+   register_setting( 'general', 'wp_sec_email' );
+}
+add_action( 'admin_init', 'wp_sec_settings_api_init' );

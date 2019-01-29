@@ -1,39 +1,10 @@
 <?php
 
 
-function wp_file_sec_install() {
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    global $wpdb;
-
-    $table_name = $wpdb->prefix . "filehashes";
-    $charset_collate = $wpdb->get_charset_collate();
-
-    $sql = "CREATE TABLE `{$wpdb->prefix}filehashes` (
-        `id` int unsigned auto_increment primary key,
-        `filename` varchar(1024) not null,
-        `filehash` char(40) not null
-    ) $charset_collate;";
-    dbDelta($sql);
-
-    $sql = "CREATE TABLE `{$wpdb->prefix}filechanges` (
-        `id` int unsigned auto_increment primary key,
-        `filename` varchar(1024) not null,
-        `change_type` varchar(8) NOT NULL,
-        `change_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-    ) $charset_collate;";
-    dbDelta($sql);
-
-    wp_schedule_event(time(), 'hourly', 'hourly_file_scan');
-    if(!wp_next_scheduled('hourly_file_scan')) {
-        wp_schedule_event(time(), 'hourly', 'hourly_file_scan');
-    }
-}
-
-
 function wp_file_sec_scan_files() {
     $home_path = ABSPATH;
-
     $files = rsearch($home_path, "/^.+\.php$/i");
+    $file_list = "<br>";
 
     foreach($files as $ent)
     {
@@ -48,26 +19,40 @@ function wp_file_sec_scan_files() {
         $results = $wpdb->get_results(
             $wpdb->prepare("SELECT `id`, `filehash`, `filename` FROM {$wpdb->prefix}filehashes WHERE `filename`=%s", $ent)
         );
-
+        
         if(sizeof($results) == 0) {
             $fc_insert_id = add_file_change($ent, 'ADD');
             $fa_insert_id = add_file($ent, $file_hash);
-            echo $ent . " (SHA1: " . $file_hash . ") added. ID: " . $fc_insert_id;
-            echo "<br>";
+            $file_list .= "ADD | " . $ent . "<br />";
         }else{
             foreach($results as $result) {
                 echo $result->id . " " . $result->filename . " " . $result->filehash;
                 if($result->filehash != $file_hash) {
                     add_file_change($result->filename, "CHANGE");
                     update_file($result->filename, $file_hash);
-                    echo " Different";
+                    $file_list .= "CHG | " . $result->filename . "<br />";
                 }
             }
-            echo "<br>";
         }
     }
+    mail_report($file_list);
 }
 add_action('hourly_file_scan', 'wp_file_sec_scan_files');
+
+function mail_report($ReportedItems) {
+    $to = get_option('wp_sec_email');
+    $subject = 'File Change Report';
+    $headers = array('Content-Type: text/html; charset=UTF-8');
+
+    $body = '
+        Hello,<br />
+
+        Some files have changed in your WordPress install. Please take a minute to review them.<br /><br />
+
+    ' . $ReportedItems;
+ 
+    wp_mail( $to, $subject, $body, $headers );
+}
 
 function update_file($filename, $filehash) {
     global $wpdb;
@@ -104,7 +89,6 @@ function rsearch($folder, $pattern) {
 
     $fileList = array();
 
-    echo $dir;
     foreach($files as $file) {
         $fileList = array_merge($fileList, $file);
     }
