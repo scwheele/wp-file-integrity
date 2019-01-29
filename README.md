@@ -1,11 +1,26 @@
 # wp-file-integrity
 
-WORK IN PROGRESS. RESULTS WILL SHOW IN PAGE HEADER, NOT FOR PRODUCTION USE.
-
 Scans wordpress filesystem to determine any changes made to the files.
 
-ToDo:
-- ~~Add admin panel dashboard to consume reports~~
-- Send email report daily
-- ~~Change initial scan to happen on cron, instead of page load~~
-- probably more
+##Configuration
+
+###Email
+Email notification will be sent to the address configured in General Settings.
+
+Go to Settings > General > WP Sec Configuration
+
+![alt text](https://i.imgur.com/5NVTzo3.png "Settings > General > WP Sec Configuration")
+
+##View Logs
+Logs will report the most recent 50 file changes, however a full change report will be available by email.
+
+![alt text](https://i.imgur.com/FrV7Qbx.png "File Change Logs")
+
+####Updates
+
+#####Known Issues
+- May send emails at random intervals, even if no changes were detected
+
+#####Fixed
+- Fixed issue where cron was not triggering
+- Fixed issue where cron & database was not being removed on uninstall

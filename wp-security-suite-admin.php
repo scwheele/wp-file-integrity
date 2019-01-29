@@ -10,6 +10,7 @@ function wp_security_suite_setup_menu(){
 function wp_security_suite_dashboard(){
     echo "<h1>WP Security Suite Dashboard</h1>";
     echo "<hr>";
+    echo "<p>We will have content here soon. Thanks for using the plugin!</p>";
 }
 
 function wp_security_suite_file_change_logs() {
