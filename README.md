@@ -1,6 +1,6 @@
 # wp-file-integrity
 
-Scans wordpress filesystem to determine any changes made to the files.
+Scans WordPress filesystem to determine any changes made to the files.
 
 ## Configuration
 
@@ -19,8 +19,9 @@ Logs will report the most recent 50 file changes, however a full change report w
 ## Updates
 
 ### Known Issues
-- May send emails at random intervals, even if no changes were detected
+
 
 ### Fixed
 - Fixed issue where cron was not triggering
 - Fixed issue where cron & database was not being removed on uninstall
+- May send emails at random intervals, even if no changes were detected
