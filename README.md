@@ -16,11 +16,11 @@ Logs will report the most recent 50 file changes, however a full change report w
 
 ![alt text](https://i.imgur.com/FrV7Qbx.png "File Change Logs")
 
-#### Updates
+## Updates
 
-##### Known Issues
+### Known Issues
 - May send emails at random intervals, even if no changes were detected
 
-##### Fixed
+### Fixed
 - Fixed issue where cron was not triggering
 - Fixed issue where cron & database was not being removed on uninstall

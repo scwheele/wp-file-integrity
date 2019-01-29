@@ -4,7 +4,7 @@
 function wp_file_sec_scan_files() {
     $home_path = ABSPATH;
     $files = rsearch($home_path, "/^.+\.php$/i");
-    $file_list = "<br>";
+    $file_list = "";
 
     foreach($files as $ent)
     {
@@ -40,18 +40,20 @@ function wp_file_sec_scan_files() {
 add_action('hourly_file_scan', 'wp_file_sec_scan_files');
 
 function mail_report($ReportedItems) {
-    $to = get_option('wp_sec_email');
-    $subject = 'File Change Report';
-    $headers = array('Content-Type: text/html; charset=UTF-8');
+    if($ReportedItems != "") {
+        $to = get_option('wp_sec_email');
+        $subject = 'File Change Report';
+        $headers = array('Content-Type: text/html; charset=UTF-8');
 
-    $body = '
-        Hello,<br />
+        $body = '
+            Hello,<br />
 
-        Some files have changed in your WordPress install. Please take a minute to review them.<br /><br />
+            Some files have changed in your WordPress install. Please take a minute to review them.<br /><br />
 
-    ' . $ReportedItems;
- 
-    wp_mail( $to, $subject, $body, $headers );
+        ' . $ReportedItems;
+    
+        wp_mail( $to, $subject, $body, $headers );
+    }
 }
 
 function update_file($filename, $filehash) {
