@@ -2,25 +2,25 @@
 
 Scans wordpress filesystem to determine any changes made to the files.
 
-##Configuration
+## Configuration
 
-###Email
+### Email
 Email notification will be sent to the address configured in General Settings.
 
 Go to Settings > General > WP Sec Configuration
 
 ![alt text](https://i.imgur.com/5NVTzo3.png "Settings > General > WP Sec Configuration")
 
-##View Logs
+## View Logs
 Logs will report the most recent 50 file changes, however a full change report will be available by email.
 
 ![alt text](https://i.imgur.com/FrV7Qbx.png "File Change Logs")
 
-####Updates
+#### Updates
 
-#####Known Issues
+##### Known Issues
 - May send emails at random intervals, even if no changes were detected
 
-#####Fixed
+##### Fixed
 - Fixed issue where cron was not triggering
 - Fixed issue where cron & database was not being removed on uninstall
