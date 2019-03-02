@@ -10,28 +10,36 @@
 
 define('WP_DEBUG', true);
 
-require_once("wp-file-security.php");
-require_once("wp-security-suite-admin.php");
+require_once("wp-ss-functions.php");
+require_once("wp-ss-file-security.php");
+require_once("wp-ss-admin.php");
+require_once("wp-ss-site-monitoring.php");
 
 
 function wp_file_sec_install() {
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     global $wpdb;    
 
-    $table_name = $wpdb->prefix . "filehashes";
     $charset_collate = $wpdb->get_charset_collate();
 
-    $sql = "CREATE TABLE `{$wpdb->prefix}filehashes` (
+    $sql = "CREATE TABLE `{$wpdb->prefix}wp-ss-filehashes` (
         `id` int unsigned auto_increment primary key,
         `filename` varchar(1024) not null,
         `filehash` char(40) not null
     ) $charset_collate;";
     dbDelta($sql);
 
-    $sql = "CREATE TABLE `{$wpdb->prefix}filechanges` (
+    $sql = "CREATE TABLE `{$wpdb->prefix}wp-ss-filechanges` (
         `id` int unsigned auto_increment primary key,
         `filename` varchar(1024) not null,
         `change_type` varchar(8) NOT NULL,
+        `change_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ) $charset_collate;";
+    dbDelta($sql);
+
+    $sql = "CREATE TABLE `{$wpdb->prefix}wp-ss-logging` (
+        `id` int unsigned auto_increment primary key,
+        `message` varchar(2048) not null,
         `change_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
     ) $charset_collate;";
     dbDelta($sql);
@@ -51,6 +59,7 @@ function wp_file_sec_uninstall() {
     dbDelta($sql);
     $sql = "DROP TABLE IF EXISTS `{$wpdb->prefix}filechanges`;";
     dbDelta($sql);
+    $sql = "DROP TABLE IF EXISTS `{$wpdb->prefix}logging`;";
 
     wp_clear_scheduled_hook('hourly_file_scan');
 }

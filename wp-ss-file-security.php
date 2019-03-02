@@ -1,5 +1,36 @@
 <?php
 
+function wp_file_sec_check_permissions() {
+    $home_path = ABSPATH;
+    $files = rsearch($home_path, "/.*/i");
+    $config_file = "wp-config.php"; // perm 660
+
+    foreach($files as $file) {
+        $file_permission = substr(sprintf('%o', fileperms($file)), -4);
+        if(substr($file, strlen($file) - strlen($config_file)) == $config_file) {
+            echo "config" . $file . " " . $file_permission . "<br>";
+            if((int)$file_permission != 660) {
+                echo '<span style="color: red;"'>$file . " Perms " . $file_permission . "</span>";
+            }
+        }
+        
+        if(is_dir($file)) {
+            echo "file" . $file . "<br>";
+            if($file_permission != 0775) {
+                echo '<span style="color: red;"'>$file . " Perms " . $file_permission . "</span>";
+            }
+        }
+        //    if($file_permission != 0664) {
+        //        echo '<span style="color: red;"'>$file . " Perms " . $file_permission . "</span>";
+        //    }else{
+        //        echo $file;
+        //    }
+       // }
+    }
+    
+}
+//add_action('daily_permission_scan', 'wp_file_sec_check_permissions');
+//add_action('init', 'wp_file_sec_check_permissions');
 
 function wp_file_sec_scan_files() {
     $home_path = ABSPATH;
@@ -58,7 +89,7 @@ function mail_report($ReportedItems) {
 
 function update_file($filename, $filehash) {
     global $wpdb;
-    $table = $wpdb->prefix . 'filehashes';
+    $table = $wpdb->prefix . 'wp-ss-filehashes';
     $data = array('filehash' => $filehash);
     $where = array('filename' => $filename);
     $wpdb->update($table, $data, $where);
@@ -66,7 +97,7 @@ function update_file($filename, $filehash) {
 
 function add_file($filename, $filehash) {
     global $wpdb;
-    $table = $wpdb->prefix . 'filehashes';
+    $table = $wpdb->prefix . 'wp-ss-filehashes';
     $data = array('filename' => $filename, 'filehash' => $filehash);
     $format = array('%s', '%s');
     $wpdb->insert($table, $data, $format);
@@ -75,7 +106,7 @@ function add_file($filename, $filehash) {
 
 function add_file_change($filename, $change_type) {
     global $wpdb;
-    $table = $wpdb->prefix . 'filechanges';
+    $table = $wpdb->prefix . 'wp-ss-filechanges';
     $data = array('filename' => $filename, 'change_type' => $change_type);
     $format = array('%s', '%s');
     $wpdb->insert($table, $data, $format);

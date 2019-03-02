@@ -25,3 +25,10 @@ Logs will report the most recent 50 file changes, however a full change report w
 - Fixed issue where cron was not triggering
 - Fixed issue where cron & database was not being removed on uninstall
 - May send emails at random intervals, even if no changes were detected
+
+### TODO
+
+- Add dashboard to view general logging
+- Add configuration tool to determine what is logged
+- Add user registration logging
+- Add logging for when themes are updated by the WP editor
